@@ -1,0 +1,196 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 10
+
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''
+{
+    label = localize('b_vouchers'),
+    tab_definition_function = G.UIDEF.used_vouchers,
+},
+'''
+position = 'after'
+match_indent = true
+payload = '''
+G.GAME.selected_back.effect.config.ttr_red and {
+label = localize('b_deck'),
+tab_definition_function = G.UIDEF.deck_gimmicks,
+},
+'''
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''local t = create_UIBox_generic_options({ back_id = from_game_over and 'from_game_over' or nil, back_func = 'setup_run', back_id = 'challenge_list', contents = {'''
+position = 'at'
+match_indent = true
+payload = '''local t = create_UIBox_generic_options({ back_id = from_game_over and 'from_game_over' or nil, back_func = 'setup_run', back_id = 'challenge_list',offset = {x = 0, y = 0}, contents = {'''
+# T.Blue Deck
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''G.STATE = G.STATES.NEW_ROUND'''
+position = 'at'
+match_indent = true
+payload = '''
+if  G.GAME.selected_back.effect.config.infinite_hands and not (G.GAME.chips >= G.GAME.blind.chips) then
+    ease_chips(0)
+    ease_hands_played(1)
+else
+    G.STATE = G.STATES.NEW_ROUND
+end
+''' # Sketch?
+
+# T.Yellow Deck
+
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''G.FUNCS.cash_out = function(e)'''
+position = 'after'
+match_indent = true
+payload = '''
+if G.GAME.selected_back.effect.config.money_mult then
+    G.GAME.current_round.dollars = math.ceil((G.GAME.current_round.dollars * G.GAME.selected_back.effect.config.money_mult + G.GAME.selected_back.effect.config.money_mult_min) * G.GAME.dollars) - G.GAME.dollars
+end
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''if not skip_increment then G.GAME.current_round.reroll_cost_increase = G.GAME.current_round.reroll_cost_increase + 1 end'''
+position = 'after'
+match_indent = true
+payload = '''
+if not skip_increment and G.GAME.selected_back.effect.config.reroll_gain then 
+    G.GAME.current_round.reroll_cost_increase = G.GAME.current_round.reroll_cost_increase + G.GAME.selected_back.effect.config.reroll_gain
+end
+'''
+
+#T. Black Deck
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''if (self.ability.set == 'Planet' or (self.ability.set == 'Booster' and self.ability.name:find('Celestial'))) and #find_joker('Astronomer') > 0 then self.cost = 0 end'''
+position = 'after'
+match_indent = true
+payload = '''
+if G.GAME.selected_back and G.GAME.selected_back.effect.config.free_jokers and (self.ability.set == "Joker" or (self.ability.set == "Booster" and self.ability.name:find("Buffoon"))) then
+    self.cost = 0
+end
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''local hand_text_set = false''' # Above joker context
+position = 'after'
+match_indent = true
+payload = '''
+G.GAME.selected_back:trigger_effect({context = 'before_hand'})
+'''
+
+# T.Magic Deck
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''G.jokers.cards[i]:calculate_joker({setting_blind = true, blind = G.GAME.round_resets.blind})
+            end'''
+position = 'after'
+match_indent = true
+payload = '''
+G.GAME.selected_back:trigger_effect({context = 'setting_blind'})
+'''
+
+# T.Nebula Deck
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''level_up_hand(used_tarot, self.ability.consumeable.hand_type)'''
+position = 'at'
+match_indent = true
+payload = '''
+level_up_hand(used_tarot, self.ability.consumeable.hand_type, nil, G.GAME.selected_back.effect.config.alt_planet_levels or 1)
+if G.GAME.selected_back.effect.config.negative_planet_levels then
+    local valid_hands = {}
+    for hand_key, hand in pairs(G.GAME.hands) do 
+        if hand.visible and hand.level > 0 then
+            valid_hands[#valid_hands+1] = hand_key
+        end 
+    end
+    if valid_hands then
+        local random_hand = pseudorandom_element(valid_hands, pseudoseed('rand_level_down'))
+        update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize(random_hand, 'poker_hands'),chips = G.GAME.hands[random_hand].chips, mult = G.GAME.hands[random_hand].mult, level=G.GAME.hands[random_hand].level})
+        level_up_hand(used_tarot, random_hand, nil, -G.GAME.selected_back.effect.config.negative_planet_levels)
+    end
+end
+'''
+# T. Anaglyph Deck
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''function Game:update_shop(dt)
+    G.BLIND_SELECT_UPDATED = false
+    G.NO_EOR_SHOP_ACTIVE = G.GAME.selected_back.effect.config.no_eor_shop
+    if G.NO_EOR_SHOP_ACTIVE then
+        if self.buttons then self.buttons:remove(); self.buttons = nil end
+        G.SHOP_SKIPPED = true
+        G.SHOP_READY = true
+        if not G.BLIND_SELECT_UPDATED then
+            Game:update_blind_select(dt)
+            G.BLIND_SELECT_UPDATED = true
+        end
+        return
+    end
+    if not G.STATE_COMPLETE then'''
+position = 'at'
+match_indent = true
+payload = '''
+function Game:update_shop(dt)
+    G.BLIND_SELECT_UPDATED = false
+    G.NO_EOR_SHOP_ACTIVE = G.GAME.selected_back.effect.config.no_eor_shop
+    if G.NO_EOR_SHOP_ACTIVE then
+        if self.buttons then self.buttons:remove(); self.buttons = nil end
+        G.SHOP_SKIPPED = true
+        G.SHOP_READY = true
+        if not G.BLIND_SELECT_UPDATED then
+            Game:update_blind_select(dt)
+            G.BLIND_SELECT_UPDATED = true
+        end
+        return
+    end
+    if not G.STATE_COMPLETE then
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''G.shop = G.shop or UIBox{'''
+position = 'before'
+match_indent = true
+payload = '''
+    G.SHOP_READY = true
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''
+            end
+        end}))
+    end
+end'''
+position = 'after'
+match_indent = true
+payload = '''
+            end
+        end}))
+    end
+    if not G.BLIND_SELECT_UPDATED then
+        Game:update_blind_select(dt)
+        G.BLIND_SELECT_UPDATED = true
+    end
+end
+'''
