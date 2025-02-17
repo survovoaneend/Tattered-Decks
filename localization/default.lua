@@ -110,16 +110,15 @@ return {
             bl_water_red = {
                 name = "The Water",
                 text = {
-                    "Each discard costs",
-                    "5 discards"
+                    "Temporarily set",
+                    "discards to 0"
                 }
             },
             bl_needle_red = {
                 name = "The Needle",
                 text = {
-                    "Each hand after the",
-                    "first hand costs",
-                    "3 hands"
+                    "Temporarily set",
+                    "hands to 1"
                 }
             }
         },
