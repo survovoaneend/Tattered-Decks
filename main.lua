@@ -119,7 +119,9 @@ function custom_deck_select_page_deck()
         }}
     }}
 	table.insert(button_area.nodes, 1, switch_button)
-	
+	if Tattered.b_side_current then
+		apply_b_sides()
+	end
 	return page
 end
 
@@ -156,42 +158,10 @@ G.FUNCS.flip_b_sides = function(e)
 		ref_value = 'y',
 		ease_to = 0,
 	}))
-	for _, deck_area in ipairs(Galdur.run_setup.deck_select_areas) do
-		if #deck_area.cards ~= 0 then
-			local card = deck_area.cards[1]
-			if Tattered.b_side_table[card.config.center.key] ~= nil then
-				local center = G.P_CENTERS[Tattered.b_side_table[card.config.center.key]]
-				G.E_MANAGER:add_event(Event({trigger = "after", delay = 0.03, blockable = false, func = function() 
-					G.E_MANAGER:add_event(Event({trigger = "immediate", blockable = false, func = function() 
-						for _, i in ipairs(deck_area.cards) do
-							i:start_dissolve({G.C.BLACK, G.C.ORANGE, G.C.RED, G.C.GOLD, G.C.JOKER_GREY}, true, 0.5)
-						end
-						return true
-					end }))
-					for _ = 1, Galdur.config.reduce and 1 or 10 do
-						G.E_MANAGER:add_event(Event({trigger = "after", blockable = false, func = function()
-								local new_card = Card(deck_area.T.x, deck_area.T.y, G.CARD_W, G.CARD_H, center, center, {galdur_back = Back(center), deck_select = 1})
-								new_card.deck_select_position = true -- Hack
-								new_card.sprite_facing = "back"
-								new_card.facing = "back"
-								new_card.children.back = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS[center.atlas or "centers"], center.pos)
-								new_card.children.back.states.hover = card.states.hover
-								new_card.children.back.states.click = card.states.click
-								new_card.children.back.states.drag = card.states.drag
-								new_card.children.back.states.collide.can = false
-								new_card.children.back:set_role({major = new_card, role_type = "Glued", draw_major = new_card})
-								deck_area:emplace(new_card)
-								return true
-							end
-						}))
-					end
-					return true
-				end}))
-			end
-		end
-	end
+	apply_b_sides()
 	
 end
+
 
 for _, args in ipairs(Galdur.pages_to_add) do
 	if args.name == "gald_select_deck" then
