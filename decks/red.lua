@@ -354,6 +354,7 @@ SMODS.Back{
 			unlocked = true,
 			discovered = true,
 		})
+		
 		SMODS.Blind:take_ownership("water", {
 			loc_vars = function(self, card)
 				if G.GAME.selected_back.effect.config.ttr_red then 
@@ -365,11 +366,12 @@ SMODS.Back{
 					return {key = 'bl_water_red'}
 				end
 			end,
-			disable = function(self)
-				G.GAME.discards_per_discard = 1
+			set_blind = function(self,card)
+				G.GAME.eor_boss_discards_temp = G.GAME.eor_boss_discards_temp + G.GAME.current_round.discards_left - 2
 			end,
-			defeat = function(self)
-				G.GAME.discards_per_discard = 1
+			disable = function(self)
+				ease_hands_played(self.discards_sub)
+				G.GAME.eor_boss_discards_temp = 0
 			end,
 			discovered = true,
 			defeated = true
@@ -385,15 +387,16 @@ SMODS.Back{
 					return {key = 'bl_needle_red'}
 				end
 			end,
-			press_play = function(self,card)
-					G.GAME.hands_per_hand = 3
+			set_blind = function(self,card)
+				if not G.GAME.blind.disabled then 
+					G.GAME.eor_boss_hands_temp = G.GAME.eor_boss_hands_temp + G.GAME.current_round.hands_left - 3
+				end
 			end,
-			disable = function(self)
-				G.GAME.hands_per_hand = 1
+			disable = function(self,card)
+				ease_hands_played(self.hands_sub)
+				G.GAME.eor_boss_hands_temp = 0
 			end,
-			defeat = function(self)
-				G.GAME.hands_per_hand = 1
-			end,
+			
 			discovered = true,
 			defeated = true
 		})
@@ -413,19 +416,20 @@ SMODS.Back{
 			p_standard_mega_2 = true,
 			p_buffoon_mega_1 = true,
 		}
-		if context.buying_card then
-			cards_bought = cards_bought + 1
+		if context.buying_card or context.open_booster or context.reroll_shop then
+			G.GAME.selected_back.effect.config.cards_bought = G.GAME.selected_back.effect.config.cards_bought + 1
 		end
 		if context.ending_shop then
-			if cards_bought == 0 then
+			if G.GAME.selected_back.effect.config.cards_bought == 0 then
 				G.E_MANAGER:add_event(Event({func = function()
 					ease_hands_played(2)
 					ease_discard(2)
 				return true end }))
 			else
-				cards_bought = 0 
+				G.GAME.selected_back.effect.config.cards_bought = 0
 			end
 		end
+		print(G.GAME.selected_back.effect.config.cards_bought)
 		if context.selling_card then
 			if context.card.ability.set == "Joker" then
 				if context.card.config.center.rarity == 3 then
