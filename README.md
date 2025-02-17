@@ -6,5 +6,5 @@ Some decks have gimmicks that make certain Jokers/Vouchers either completely bus
 THIS IS VERY WIP, I just needed to put up this repo so people can play what's out right now. I know the button placement is weird. I know the menu switch is weird. I'll fix it eventually I promise.
 
 # Dependancies
-* [Steamodded](https://github.com/Steamopollys/Steamodded)
+* [Steamodded](https://github.com/Steamopollys/Steamodded) (newcalc)
 * [Galdur](https://github.com/Eremel/Galdur)
