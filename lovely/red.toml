@@ -11,7 +11,7 @@ pattern = '''G.GAME.current_round.discards_left = math.max(0, G.GAME.round_reset
 position = 'at'
 match_indent = true
 payload = '''
-if not G.GAME.selected_back.effect.config.ttr_red or (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2 then
+if not G.GAME.selected_back.effect.config.ttr_red then
     G.GAME.current_round.discards_left = math.max(0, G.GAME.round_resets.discards + G.GAME.round_bonus.discards)
     G.GAME.current_round.hands_left = (math.max(1, G.GAME.round_resets.hands + G.GAME.round_bonus.next_hands))
 end'''
@@ -24,7 +24,7 @@ pattern = '''G.GAME.current_round.discards_left = math.max(0, G.GAME.round_reset
 position = 'at'
 match_indent = true
 payload = '''
-if not G.GAME.selected_back.effect.config.ttr_red or (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2 then
+if not G.GAME.selected_back.effect.config.ttr_red then
     G.GAME.current_round.discards_left = math.max(0, G.GAME.round_resets.discards + G.GAME.round_bonus.discards)
     G.GAME.current_round.hands_left = (math.max(1, G.GAME.round_resets.hands + G.GAME.round_bonus.next_hands))
 end'''
@@ -72,43 +72,14 @@ position = 'at'
 match_indent = true
 payload = '''ease_hands_played(-G.GAME.hands_per_hand)'''
 
-[[patches]]
-[patches.pattern]
-target = 'blind.lua'
-pattern = '''if self.name == 'The Water' and not reset then 
-        self.discards_sub = G.GAME.current_round.discards_left
-        ease_discard(-self.discards_sub)
-    end'''
-position = 'at'
-match_indent = true
-payload = ''' if self.name == 'The Water' and not reset then 
-        if not G.GAME.selected_back.effect.config.ttr_red then
-            self.discards_sub = G.GAME.current_round.discards_left
-            ease_discard(-self.discards_sub)
-        else
-            G.GAME.discards_per_discard = 5
-        end
-end'''
 
 [[patches]]
 [patches.pattern]
 target = 'blind.lua'
-pattern = '''if self.name == 'The Needle' and not reset then 
-        self.hands_sub = G.GAME.round_resets.hands - 1
-        ease_hands_played(-self.hands_sub)
-    end'''
+pattern = '''self.hands_sub = G.GAME.round_resets.hands - 1 '''
 position = 'at'
 match_indent = true
-payload = ''' if self.name == 'The Needle' and not reset then 
-    if not G.GAME.selected_back.effect.config.ttr_red then
-        self.hands_sub = G.GAME.round_resets.hands - 1
-        ease_hands_played(-self.hands_sub)
-    else
-        if G.GAME.current_round.hands_played > 0 then
-            G.GAME.hands_per_hand = 3
-        end
-    end
-end'''
+payload = '''self.hands_sub = G.GAME.current_round.hands_left - 1 '''
 
 [[patches]]
 [patches.pattern]
