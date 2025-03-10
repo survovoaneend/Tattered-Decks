@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 [manifest]
 version = "1.0.0"
 dump_lua = true
@@ -124,7 +124,6 @@ match_indent = true
 payload = '''
 G.GAME.current_round.dollars = math.floor(config.dollars)
 '''
-=======
 [manifest]
 version = "1.0.0"
 dump_lua = true
@@ -251,4 +250,3 @@ match_indent = true
 payload = '''
 G.GAME.current_round.dollars = math.floor(config.dollars)
 '''
->>>>>>> b27156c (idk what i'm doing)

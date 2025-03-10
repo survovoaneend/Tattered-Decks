@@ -1,25 +1,4 @@
-<<<<<<< HEAD
-SMODS.Back{
-	
-	name = "Tattered Yellow Deck",
-	key = "yellow",
-    atlas = "b_side_atlas",
-	pos = {x = 2, y = 0},
-	config = {b_side = true},
-	loc_txt = {
-		name = "Tattered Yellow Deck",
-		text ={
-			"???"
-		},
-    },
-	loc_vars = function(self)
-        return {}
-	end,
-	apply = function()
-	end,
-	omit = true
-}
-=======
+
 SMODS.Back{
 	
 	name = "Tattered Yellow Deck",
@@ -75,7 +54,4 @@ SMODS.Back{
 	end,
 	omit = true
 }
-
-
->>>>>>> b27156c (idk what i'm doing)
 Tattered.add_b_side("b_" .. "yellow", "b_tattered_" .. "yellow")
