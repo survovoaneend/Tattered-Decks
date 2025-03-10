@@ -1,0 +1,26 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 10
+
+
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''G.FUNCS.cash_out = function(e)'''
+position = 'after'
+match_indent = true
+payload = '''
+if G.GAME.selected_back.effect.config.ttr_yellow then
+    G.GAME.current_round.dollars = math.ceil((G.GAME.current_round.dollars * G.GAME.selected_back.effect.config.money_mult + G.GAME.selected_back.effect.config.money_mult_min) * G.GAME.dollars) - G.GAME.dollars
+end
+'''
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''if not skip_increment then G.GAME.current_round.reroll_cost_increase = G.GAME.current_round.reroll_cost_increase + 1 end'''
+position = 'at'
+match_indent = true
+payload = '''
+if not skip_increment then G.GAME.current_round.reroll_cost_increase = G.GAME.current_round.reroll_cost_increase + G.GAME.reroll_scaling end
+'''

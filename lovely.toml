@@ -5,6 +5,19 @@ priority = 10
 
 [[patches]]
 [patches.pattern]
+<<<<<<< HEAD
+=======
+target = 'functions/button_callbacks.lua'
+pattern = '''G.FUNCS.start_run = function(e, args) '''
+position = 'after'
+match_indent = true
+payload = '''
+Tattered.b_side_current = false
+'''
+
+[[patches]]
+[patches.pattern]
+>>>>>>> b27156c (idk what i'm doing)
 target = 'functions/UI_definitions.lua'
 pattern = '''
 {
@@ -43,6 +56,7 @@ else
 end
 ''' # Sketch?
 
+<<<<<<< HEAD
 # T.Yellow Deck
 
 [[patches]]
@@ -56,6 +70,9 @@ if G.GAME.selected_back.effect.config.money_mult then
     G.GAME.current_round.dollars = math.ceil((G.GAME.current_round.dollars * G.GAME.selected_back.effect.config.money_mult + G.GAME.selected_back.effect.config.money_mult_min) * G.GAME.dollars) - G.GAME.dollars
 end
 '''
+=======
+
+>>>>>>> b27156c (idk what i'm doing)
 
 [[patches]]
 [patches.pattern]
