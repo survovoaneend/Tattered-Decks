@@ -1,11 +1,8 @@
 Tattered = SMODS.current_mod
-<<<<<<< HEAD
-
-=======
 function deck_select_confirm()
 
 end
->>>>>>> b27156c (idk what i'm doing)
+
 -- Definitions
 Tattered.b_side_table = {}
 Tattered.b_side_current = false
@@ -55,17 +52,7 @@ function find_in_list(list, target)
 	return nil
 end
 
-<<<<<<< HEAD
---SMODS.Sound({
-	--key = "music_tattered",
-	--path = "music_tattered.mp3",
-	--pitch = 1,
-	--volume = 1,
-	--select_music_track = function()
-		--return on_b_sides()
-	--end,
---})
-=======
+
 SMODS.Sound({
 	key = "music_tattered",
 	path = "music_tattered.mp3",
@@ -75,7 +62,6 @@ SMODS.Sound({
 		return on_b_sides()
 	end,
 })
->>>>>>> b27156c (idk what i'm doing)
 -- Decks
 
 
@@ -86,21 +72,13 @@ SMODS.Atlas {
     py = 95
 }
 --to play music
-<<<<<<< HEAD
-function apply_b_sides()
-=======
+
 G.FUNCS.apply_b_sides = function()
->>>>>>> b27156c (idk what i'm doing)
     for _, deck_area in ipairs(Galdur.run_setup.deck_select_areas) do
         if #deck_area.cards ~= 0 then
             local card = deck_area.cards[1]
             if Tattered.b_side_table[card.config.center.key] ~= nil then
                 local center = G.P_CENTERS[Tattered.b_side_table[card.config.center.key]]
-<<<<<<< HEAD
-                G.E_MANAGER:add_event(Event({trigger = "immediate", blockable = false, func = function() 
-                    for _, i in ipairs(deck_area.cards) do
-                        i:start_dissolve({G.C.BLACK, G.C.ORANGE, G.C.RED, G.C.GOLD, G.C.JOKER_GREY}, true, 0.5)
-=======
 				local cards_to_remove = {}
         		for _, card in ipairs(deck_area.cards) do
            			 table.insert(cards_to_remove, card)
@@ -108,7 +86,6 @@ G.FUNCS.apply_b_sides = function()
                 G.E_MANAGER:add_event(Event({trigger = "immediate", blockable = false, func = function() 
                     for _, cards in ipairs(cards_to_remove) do
                         cards:remove()
->>>>>>> b27156c (idk what i'm doing)
                     end
                     return true
                 end }))
@@ -144,22 +121,15 @@ end
 function custom_deck_select_page_deck()
     local page = deck_select_page_deck()
 	local button_area = page.nodes[1].nodes[2].nodes[1].nodes[1]
-<<<<<<< HEAD
 
 	local switch_button = {n = G.UIT.R, config={align = "cm", padding = 0.15}, nodes = {
-        {n=G.UIT.R, config = {maxw = 2.5, minw = 2.5, minh = 0.8, r = 0.1, hover = true, ref_value = 1, button = "flip_b_sides", colour = Tattered.badge_colour, align = "cm", emboss = 0.1}, nodes = {
-=======
-	local switch_button = {n = G.UIT.R, config={align = "cm", padding = 0.15}, nodes = {
         {n=G.UIT.R, config = {maxw = 2.5, minw = 2.5, minh = 0.2, r = 0.1, hover = true, ref_value = 1, button = "flip_b_sides", colour = Tattered.badge_colour, align = "cm", emboss = 0.1}, nodes = {
->>>>>>> b27156c (idk what i'm doing)
             {n=G.UIT.T, config={text = "Tattered", scale = 0.4, colour = Tattered.badge_text_colour}}
         }}
     }}
 	table.insert(button_area.nodes, 1, switch_button)
 	if Tattered.b_side_current then
-<<<<<<< HEAD
-		apply_b_sides()
-=======
+
 		G.E_MANAGER:add_event(Event({
             trigger = "after",
             delay = 0.1,
@@ -169,7 +139,6 @@ function custom_deck_select_page_deck()
                 return true
             end
         }))
->>>>>>> b27156c (idk what i'm doing)
 	end
 	return page
 end
@@ -207,25 +176,19 @@ G.FUNCS.flip_b_sides = function(e)
 		ref_value = 'y',
 		ease_to = 0,
 	}))
-<<<<<<< HEAD
-	apply_b_sides()
-	
-end
 
 
-=======
+
+
 	G.FUNCS.apply_b_sides()
 end
 
->>>>>>> b27156c (idk what i'm doing)
+
 for _, args in ipairs(Galdur.pages_to_add) do
 	if args.name == "gald_select_deck" then
 		args.definition = custom_deck_select_page_deck
 	end
 end
-<<<<<<< HEAD
-=======
-
 local original_deck_page = G.FUNCS.change_deck_page
 G.FUNCS.change_deck_page = function(args)
     original_deck_page(args)
@@ -244,4 +207,4 @@ G.FUNCS.change_deck_page = function(args)
 			end
         end
 end
->>>>>>> b27156c (idk what i'm doing)
+
