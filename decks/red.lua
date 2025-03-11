@@ -9,11 +9,11 @@ SMODS.Back{
 		hands = 24-4, 
 		discards = 32-3, 
 		ttr_red = true, 
-		cards_bought = 0, 
-		boss_hands = 0, 
-		boss_discards = 0, 
-		normal_hands = 0, 
-		normal_discards = 0
+		cards_bought = 0,
+		boss_hands = 0,
+        boss_discards = 0,
+        normal_hands = 0,
+        normal_discards = 0,
 	},
 	loc_txt = {
 		name = "Tattered Red Deck",
@@ -45,7 +45,7 @@ SMODS.Back{
 								trigger = "immediate",
 								func = function()
 									G.GAME.eor_boss_discards_temp = G.GAME.eor_boss_discards_temp + 1
-									boss_discards = G.GAME.eor_boss_discards_perm + G.GAME.eor_boss_discards_temp
+									G.GAME.selected_back.effect.config.boss_discards = G.GAME.eor_boss_discards_perm + G.GAME.eor_boss_discards_temp
 									return true
 								end
 							}))
@@ -115,6 +115,7 @@ SMODS.Back{
 								trigger = "immediate",
 								func = function()
 									G.GAME.eor_boss_discards_temp = G.GAME.eor_boss_discards_temp + G.GAME.current_round.discards_used
+									G.GAME.selected_back.effect.config.boss_discards = G.GAME.eor_boss_discards_perm + G.GAME.eor_boss_discards_temp
 									return true
 								end
 							}))
@@ -123,6 +124,7 @@ SMODS.Back{
 								trigger = "immediate",
 								func = function()
 									G.GAME.eor_normal_discards_temp = G.GAME.eor_normal_discards_temp + G.GAME.current_round.discards_used
+									G.GAME.selected_back.effect.config.normal_discards = G.GAME.eor_normal_discards_perm + G.GAME.eor_normal_discards_temp
 									return true
 								end
 							}))
@@ -172,6 +174,7 @@ SMODS.Back{
 		SMODS.Joker:take_ownership("dusk", {
 			loc_vars = function(self, card)
 				if G.GAME.selected_back.effect.config.ttr_red then 
+
 					local status_text
 					if G.GAME.current_round.hands_played >= 3 then
 						status_text = 'Active!'
@@ -182,8 +185,15 @@ SMODS.Back{
 				end
 			end,
 			calculate = function(self, card, context)
+				if context.end_of_round then
+					G.GAME.current_round.hands_played = 0
+				end
+				if context.after and G.GAME.current_round.hands_played == 2 then
+					local eval = function() return G.GAME.current_round.hands_played >= 2 end
+                	juice_card_until(card, eval, true)
+				end
 				if G.GAME.current_round.hands_played >= 2 then
-					if context.cardarea == G.play and context.repetition and G.GAME.current_round.hands_played >= 3 then
+					if context.cardarea == G.play and context.repetition and G.GAME.current_round.hands_played >= 3 then	
 						return {
 							message = localize("k_again_ex"),
 							repetitions = 1,
@@ -208,6 +218,13 @@ SMODS.Back{
 				end
 			end,
 			calculate = function(self, card, context)
+				if context.end_of_round then
+					G.GAME.current_round.hands_played = 0
+				end
+				if context.after and G.GAME.current_round.hands_played == 2 then
+					local eval = function() return G.GAME.current_round.hands_played >= 2 end
+                	juice_card_until(card, eval, true)
+				end
 				if context.joker_main and G.GAME.current_round.hands_played >= 2 then
 					if G.GAME.current_round.hands_played >= 3 then
 						return {
@@ -251,13 +268,29 @@ SMODS.Back{
 				if context.setting_blind and not context.blueprint then
 					return {
 						G.E_MANAGER:add_event(Event({func = function()
-							if G.GAME.current_round.discards_left > 0 then
-								ease_hands_played(math.floor((G.GAME.current_round.discards_left)/2))
-								ease_discard(-G.GAME.current_round.discards_left, nil, true)
-							end
+							G.GAME.cant_discard = true
 						return true end }))
 					}
 				end		
+				if context.end_of_round and not (context.individual or context.repetition) and not context.blueprint then
+					G.E_MANAGER:add_event(Event({
+						trigger = "immediate",
+						func = function()
+							G.GAME.eor_boss_hands_temp = G.GAME.eor_boss_hands_temp + 1
+							G.GAME.eor_normal_hands_temp = G.GAME.eor_normal_hands_temp + 1
+							G.GAME.selected_back.effect.config.normal_hands = G.GAME.eor_normal_hands_perm + G.GAME.eor_normal_hands_temp
+							G.GAME.selected_back.effect.config.boss_hands = G.GAME.eor_boss_hands_perm + G.GAME.eor_boss_hands_temp
+							return true
+						end
+					}))
+				end
+				if context.selling_self and not context.blueprint then
+					return {
+						G.E_MANAGER:add_event(Event({func = function()
+							G.GAME.cant_discard = false
+						return true end }))
+					}
+				end
 			end,
 			loc_vars = function(self, card)
 				if G.GAME.selected_back.effect.config.ttr_red then 
@@ -367,10 +400,12 @@ SMODS.Back{
 				end
 			end,
 			set_blind = function(self,card)
+				self.discards_sub = G.GAME.current_round.discards_left
+                ease_discard(-self.discards_sub)
 				G.GAME.eor_boss_discards_temp = G.GAME.eor_boss_discards_temp + G.GAME.current_round.discards_left - 2
 			end,
 			disable = function(self)
-				ease_hands_played(self.discards_sub)
+				ease_discard(self.discards_sub)
 				G.GAME.eor_boss_discards_temp = 0
 			end,
 			discovered = true,
@@ -388,8 +423,10 @@ SMODS.Back{
 				end
 			end,
 			set_blind = function(self,card)
+				self.hands_sub = G.GAME.current_round.hands_left - 1
+				ease_hands_played(-self.hands_sub)
 				if not G.GAME.blind.disabled then 
-					G.GAME.eor_boss_hands_temp = G.GAME.eor_boss_hands_temp + G.GAME.current_round.hands_left - 3
+					G.GAME.eor_boss_hands_temp = G.GAME.eor_boss_hands_temp + G.GAME.current_round.hands_left - 4
 				end
 			end,
 			disable = function(self,card)
@@ -402,10 +439,11 @@ SMODS.Back{
 		})
 	end,
 	calculate = function(self, card, context)
-		boss_hands = G.GAME.eor_boss_hands_perm +G.GAME.eor_boss_hands_temp
-		boss_discards = G.GAME.eor_boss_discards_perm +G.GAME.eor_boss_discards_temp
-		normal_hands = G.GAME.eor_normal_hands_perm +G.GAME.eor_normal_hands_temp
-		normal_discards = G.GAME.eor_normal_discards_perm +G.GAME.eor_normal_discards_temp
+		
+		G.GAME.selected_back.effect.config.boss_hands = G.GAME.eor_boss_hands_perm +G.GAME.eor_boss_hands_temp
+        G.GAME.selected_back.effect.config.boss_discards = G.GAME.eor_boss_discards_perm +G.GAME.eor_boss_discards_temp
+	    G.GAME.selected_back.effect.config.normal_hands = G.GAME.eor_normal_hands_perm +G.GAME.eor_normal_hands_temp 
+		G.GAME.selected_back.effect.config.normal_discards = G.GAME.eor_normal_discards_perm +G.GAME.eor_normal_discards_temp
 		local megapacks = {
 			p_arcana_mega_1 = true,
 			p_arcana_mega_2 = true,
@@ -429,7 +467,6 @@ SMODS.Back{
 				G.GAME.selected_back.effect.config.cards_bought = 0
 			end
 		end
-		print(G.GAME.selected_back.effect.config.cards_bought)
 		if context.selling_card then
 			if context.card.ability.set == "Joker" then
 				if context.card.config.center.rarity == 3 then
@@ -459,51 +496,62 @@ SMODS.Back{
 				ease_hands_played(1)
 			return true end }))
 		end
-	
+		---idk what the fuck im doing
+		if context.end_of_round and not context.repetition and not context.individual then
+		G.E_MANAGER:add_event(Event({trigger = "after", delay = 0.1, func = function()
+			if context.end_of_round and not context.repetition and not context.individual then
+				G.GAME.selected_back.effect.config.boss_discards = G.GAME.eor_boss_discards_perm + G.GAME.eor_boss_discards_temp
+				if (G.GAME.selected_back.effect.config.boss_discards > 0 or G.GAME.selected_back.effect.config.normal_discards > 0) then
+					if G.GAME.last_blind.boss then
+						G.E_MANAGER:add_event(Event({trigger = "after", delay = 0.1, func = function()
+							ease_discard(G.GAME.selected_back.effect.config.boss_discards)
+							G.GAME.eor_boss_discards_temp = 0
+						return true end }))
+					else
+						G.E_MANAGER:add_event(Event({trigger = "after", delay = 0.1, func = function()
+							ease_discard(G.GAME.selected_back.effect.config.normal_discards)
+							G.GAME.eor_normal_discards_temp = 0
+						return true end }))
+					end	
+				end
+			end	
+			if context.end_of_round and not context.repetition and not context.individual then
+				G.GAME.selected_back.effect.config.boss_hands = G.GAME.eor_boss_hands_perm +G.GAME.eor_boss_hands_temp
+				if (G.GAME.selected_back.effect.config.boss_hands > 0 or G.GAME.selected_back.effect.config.normal_hands > 0) then
+					if G.GAME.last_blind.boss then
+						G.E_MANAGER:add_event(Event({trigger = "after", delay = 0.1,func = function()
+							ease_hands_played(G.GAME.selected_back.effect.config.boss_hands)
+							G.GAME.eor_boss_hands_temp = 0
+						return true end }))
+					else
+						G.E_MANAGER:add_event(Event({trigger = "after", delay = 0.1, func = function()
+							ease_hands_played(G.GAME.selected_back.effect.config.normal_hands)
+							G.GAME.eor_normal_hands_temp = 0
+						return true end }))
+					end	
+				end
+			end
+			return true end }))
+		end
+
 		if context.end_of_round and G.GAME.last_blind.boss and not context.repetition and not context.individual then
 			if G.GAME.current_round.hands_played == 1 then	
 				G.GAME.eor_boss_hands_temp = G.GAME.eor_boss_hands_temp + 1
-				boss_hands = G.GAME.eor_boss_hands_perm + G.GAME.eor_boss_hands_temp
+				G.GAME.selected_back.effect.config.boss_hands = G.GAME.eor_boss_hands_perm + G.GAME.eor_boss_hands_temp
 			end
 			if G.GAME.current_round.discards_used == 0 then
 				G.GAME.eor_boss_discards_temp = G.GAME.eor_boss_discards_temp + 2
-				boss_discards = G.GAME.eor_boss_discards_perm + G.GAME.eor_boss_discards_temp
+				G.GAME.selected_back.effect.config.boss_discards = G.GAME.eor_boss_discards_perm + G.GAME.eor_boss_discards_temp
 			end
 		end
 		if context.end_of_round and G.GAME.current_round.hands_left == 0 and not context.repetition and not context.individual then
 			if G.GAME.last_blind.boss then	
 				G.GAME.eor_boss_hands_temp = G.GAME.eor_boss_hands_temp + 2
-				boss_hands = G.GAME.eor_boss_hands_perm + G.GAME.eor_boss_hands_temp
+				G.GAME.selected_back.effect.config.boss_hands = G.GAME.eor_boss_hands_perm + G.GAME.eor_boss_hands_temp
 			else 
 				G.GAME.eor_normal_hands_temp = G.GAME.eor_normal_hands_temp + 2
-				normal_hands = G.GAME.eor_normal_hands_perm + G.GAME.eor_normal_hands_temp
+				G.GAME.selected_back.effect.config.normal_hands = G.GAME.eor_normal_hands_perm + G.GAME.eor_normal_hands_temp
 			end
-		end
-		if context.end_of_round and (boss_discards > 0 or normal_discards > 0) and not context.repetition and not context.individual then
-			if G.GAME.last_blind.boss then
-				G.E_MANAGER:add_event(Event({func = function()
-					ease_discard(boss_discards)
-					G.GAME.eor_boss_discards_temp = 0
-				return true end }))
-			else
-				G.E_MANAGER:add_event(Event({func = function()
-					ease_discard(normal_discards)
-					G.GAME.eor_normal_discards_temp = 0
-				return true end }))
-			end	
-		end	
-		if context.end_of_round and (boss_hands > 0 or normal_hands > 0) and not context.repetition and not context.individual then
-			if G.GAME.last_blind.boss then
-				G.E_MANAGER:add_event(Event({func = function()
-					ease_hands_played(boss_hands)
-					G.GAME.eor_boss_hands_temp = 0
-				return true end }))
-			else
-				G.E_MANAGER:add_event(Event({func = function()
-					ease_hands_played(normal_hands)
-					G.GAME.eor_normal_hands_temp = 0
-				return true end }))
-			end	
 		end	
 	end,
 	omit = true

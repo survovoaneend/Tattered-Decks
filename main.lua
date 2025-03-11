@@ -196,8 +196,7 @@ G.FUNCS.change_deck_page = function(args)
         if Tattered.b_side_current then
 			if Tattered.b_side_current then
 				G.E_MANAGER:add_event(Event({
-					trigger = "after",
-					delay = 0.1,
+					trigger = "immediate",
 					blockable = false,
 					func = function()
 						G.FUNCS.apply_b_sides()

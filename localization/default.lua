@@ -2,6 +2,7 @@
 return {
     descriptions = {
         Joker = {
+            --T. Red
             j_drunkard_red = {
                 name = "Drunkard",
                 text = {
@@ -61,10 +62,9 @@ return {
             j_burglar_red = {
                 name = "Burglar",
                 text = {
-                    "When {C:attention}Blind{} is selected,",
-                    "convert every {C:red}2{} discards",
-                    "to {C:blue}1{} hand",
-                    "{C:inactive}+#1# hands"
+                    "{C:blue}+1{} hand upon defeating a",
+                    "{C:attention}blind{}. Discards are {C:attention}disabled{}",
+                    "when selecting blind."
                 }
             },
             j_yorick_red = {
@@ -78,6 +78,7 @@ return {
             }
         },
         Voucher = {
+            --T. Red
             v_grabber_red = {
                 name = "Grabber",
                 text = {
@@ -108,6 +109,7 @@ return {
             }
         },
         Blind = {
+            --T. Red
             bl_water_red = {
                 name = "The Water",
                 text = {
