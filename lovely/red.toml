@@ -124,10 +124,6 @@ match_indent = true
 payload = '''
 G.GAME.current_round.dollars = math.floor(config.dollars)
 '''
-[manifest]
-version = "1.0.0"
-dump_lua = true
-priority = 10
 
 [[patches]]
 [patches.pattern]
