@@ -123,7 +123,8 @@ SMODS.Back{
 					end
 					return true end }))
 				delay(0.6)
-			end
+			end,
+			discovered = true,
 		})
 		SMODS.Blind:take_ownership("ox",{
 			loc_vars = function(self, card)
@@ -144,7 +145,8 @@ SMODS.Back{
 						ease_dollars(-G.GAME.dollars+1, true)
 					end
 				end
-			end
+			end,
+			discovered = true,
 		})
 	end,
 
