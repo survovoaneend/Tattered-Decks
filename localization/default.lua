@@ -75,7 +75,51 @@ return {
                     "cards discarded",
                     "{C:inactive}(Currently {X:mult,C:white} X#4# {C:inactive} Mult)"
                 }
-            }
+            },
+            --T. Yellow
+            j_delayed_grat_yellow = {
+                name = "Delayed Gratification",
+                text = {
+                    "Earn {X:money,C:white}+$0.1X{} per {C:attention}discard{} if",
+                    "no discards are used",
+                    "by end of the round"
+                }
+            },
+            j_cloud_9_yellow = {
+                name = "Cloud 9",
+                text = {
+                    "Earn {X:money,C:white}$0.1X{} for each",
+                    "{C:attention}9{} in your {C:attention}full deck",
+                    "at end of round",
+                    "{C:inactive}(Currently {X:money,C:white}+$#2#X{}{C:inactive})"
+                }
+            },
+            j_golden_yellow = {
+                name = "Golden Joker",
+                text = {
+                    "Earn {X:money,C:white}$0.3X{} at",
+                    "end of round"
+                }
+            },
+            j_rocket_yellow = {
+                name = "Rocket",
+                text = {
+                    "Earn {X:money,C:white}$#1#X{} at end of round",
+                    "Payout increases by {X:money,C:white}$0.1X{}",
+                    "when {C:attention}Boss Blind{} is defeated",
+                }
+            },
+            j_satellite_yellow = {
+                name = "Satellite",
+                text = {
+                    "Earn {X:money,C:white}$0.1X{} at end of",
+                    "round per unique {C:planet}Planet",
+                    "card used this run",
+                    "{C:inactive}(Currently {X:money,C:white}+$#2#X{C:inactive})"
+                }
+            },
+
+
         },
         Voucher = {
             --T. Red
@@ -108,6 +152,17 @@ return {
                 }
             }
         },
+        Spectral = {
+            --T. Yellow
+            c_wraith_yellow = {
+                name = "Wraith",
+                text = {
+                    "Creates a random",
+                    "{C:red}Rare{C:attention} Joker{},",
+                    "sets money to {C:money}$1"
+                }
+            }
+        },
         Blind = {
             --T. Red
             bl_water_red = {
@@ -122,6 +177,13 @@ return {
                 text = {
                     "Temporarily set",
                     "hands to 1"
+                }
+            },
+            bl_ox_yellow = {
+                name = "The Ox",
+                text = {
+                    "Playing a #1#",
+                    "sets money to $1"
                 }
             }
         },

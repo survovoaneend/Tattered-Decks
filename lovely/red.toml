@@ -102,17 +102,7 @@ else
 end
 '''
 #part of yellow as well
-[[patches]]
-[patches.pattern]
-target = 'functions/common_events.lua'
-pattern = '''
-{n=G.UIT.T, config={text = localize('$')..format_ui_value(config.dollars), scale = 1.2*scale, colour = G.C.WHITE, shadow = true, juice = true}}
-'''
-position = 'at'
-match_indent = true
-payload = '''
-{n=G.UIT.T, config={text = localize('$')..format_ui_value(math.floor(config.dollars)), scale = 1.2*scale, colour = G.C.WHITE, shadow = true, juice = true}}
-'''
+
 
 [[patches]]
 [patches.pattern]

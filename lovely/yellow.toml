@@ -3,6 +3,17 @@ version = "1.0.0"
 dump_lua = true
 priority = 10
 
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''
+{n=G.UIT.T, config={text = localize('$')..format_ui_value(config.dollars), scale = 1.2*scale, colour = G.C.WHITE, shadow = true, juice = true}}
+'''
+position = 'at'
+match_indent = true
+payload = '''
+{n=G.UIT.T, config={text = (not G.GAME.selected_back.effect.config.money_mult) and (localize('$')..format_ui_value(math.floor(config.dollars))) or localize('$') .. (format_ui_value(config.dollars * G.GAME.selected_back.effect.config.money_mult + G.GAME.selected_back.effect.config.money_mult_min) .. "X" ) , scale = 1.2*scale, colour = G.C.WHITE, shadow = true, juice = true}}
+'''
 
 [[patches]]
 [patches.pattern]
@@ -24,3 +35,27 @@ match_indent = true
 payload = '''
 if not skip_increment then G.GAME.current_round.reroll_cost_increase = G.GAME.current_round.reroll_cost_increase + G.GAME.reroll_scaling end
 '''
+
+#[[patches]]
+#[patches.pattern]
+#target = 'functions/common_events.lua'
+#pattern = '''
+#if mod < 0 then
+    #text = '-'..localize('$')
+    #col = G.C.RED              
+#else
+    #inc_career_stat('c_dollars_earned', mod)
+#end
+#'''
+#position = 'at'
+#payload = '''
+#if mod < 0 then
+    #text = '-'..localize('$')
+    #col = G.C.RED              
+#elseif  then
+    #text = 'X'..localize('$')
+    #col = G.C.MONEY
+#else
+   # inc_career_stat('c_dollars_earned', mod)
+#end
+#'''
