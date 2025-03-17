@@ -53,15 +53,15 @@ function find_in_list(list, target)
 end
 
 
-SMODS.Sound({
-	key = "music_tattered",
-	path = "music_tattered.mp3",
-	pitch = 1,
-	volume = 1,
-	select_music_track = function()
-		return on_b_sides()
-	end,
-})
+--SMODS.Sound({
+	--key = "music_tattered",
+	--path = "music_tattered.mp3",
+	--pitch = 1,
+	--volume = 1,
+	--select_music_track = function()
+		--return on_b_sides()
+	--end,
+--})
 -- Decks
 
 
